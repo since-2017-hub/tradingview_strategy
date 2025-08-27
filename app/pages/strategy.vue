@@ -24,7 +24,7 @@
       <h3 class="font-medium mb-2">Result</h3>
       <p class="text-slate-700">Equity: <span class="font-mono">{{ result.equity }}</span></p>
       <ul class="mt-2 space-y-1 text-slate-600">
-        <li v-for="(t,i) in result.trades" :key="i">{{ t.type }} @ {{ t.price }} (i:{{ t.index }})</li>
+        <li v-for="(t, i) in result.trades" :key="i">{{ t.type }} @ {{ t.price }} (i:{{ t.index }})</li>
       </ul>
     </div>
   </div>
@@ -32,7 +32,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useStrategySimulator } from '~/composables/useStrategySimulator'
+import { useStrategySimulator } from '../../composables/useStrategySimulator'
 
 const short = ref(3)
 const long = ref(5)
@@ -40,7 +40,7 @@ const result = ref(null as any)
 
 const { simulate } = useStrategySimulator()
 
-function run(){
+function run() {
   result.value = simulate({ short: short.value, long: long.value })
 }
 </script>
