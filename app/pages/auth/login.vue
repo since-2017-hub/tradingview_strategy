@@ -1,26 +1,34 @@
 <template>
-  <div class="login-container">
-    <form @submit.prevent="handleLogin" class="login-form">
-      <h2>Login</h2>
+  <div>
+    <form @submit.prevent="handleLogin" class="space-y-4">
+      <h2 class="text-xl font-semibold">Sign in to your account</h2>
+
       <div>
-        <label>Email</label>
-        <input v-model="email" type="email" required />
+        <label class="block text-sm text-slate-700">Email</label>
+        <input v-model="email" type="email" required class="mt-1 block w-full rounded border-slate-200 shadow-sm focus:ring-sky-500 focus:border-sky-500" />
       </div>
+
       <div>
-        <label>Password</label>
-        <input v-model="password" type="password" required />
+        <label class="block text-sm text-slate-700">Password</label>
+        <input v-model="password" type="password" required class="mt-1 block w-full rounded border-slate-200 shadow-sm focus:ring-sky-500 focus:border-sky-500" />
       </div>
-      <button type="submit">Login</button>
-      <p v-if="error" class="error">{{ error }}</p>
-      <p class="hint">Don't have an account? <NuxtLink to="/auth/signup">Sign up</NuxtLink></p>
+
+      <div>
+        <button type="submit" class="w-full bg-sky-600 text-white py-2 rounded">Login</button>
+      </div>
+
+      <p v-if="error" class="text-sm text-red-600">{{ error }}</p>
+
+      <p class="text-sm text-slate-600">Don't have an account? <NuxtLink class="text-sky-600" to="/auth/signup">Sign up</NuxtLink></p>
     </form>
   </div>
 </template>
 
 <script setup>
+definePageMeta({ layout: 'auth' })
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useAuth } from '../../../composables/useAuth'
+import { useAuth } from '~/composables/useAuth'
 
 const { login } = useAuth()
 const email = ref('')
@@ -35,7 +43,6 @@ async function handleLogin(){
     return
   }
   try {
-    // Replace with actual API call. Here we simulate and accept any credentials.
     const token = await login({ email: email.value, password: password.value })
     if (token) {
       router.push('/dashboard')
@@ -45,11 +52,3 @@ async function handleLogin(){
   }
 }
 </script>
-
-<style scoped>
-.login-container { max-width:420px; margin:40px auto }
-.login-form { background:#fff; padding:20px; border-radius:8px; box-shadow:0 4px 20px rgba(0,0,0,0.06) }
-.login-form h2 { margin-bottom:12px }
-.login-form input { display:block; width:100%; margin:8px 0 12px; padding:8px }
-.error { color:#c00 }
-</style>

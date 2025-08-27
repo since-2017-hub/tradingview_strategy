@@ -7,15 +7,15 @@ export function useStrategySimulator() {
   function simulate({ short = 3, long = 5 } = {}) {
     const prices = samplePrices;
     const result = {
-      trades: [],
+      trades: [] as { type: "buy" | "sell"; price: number; index: number }[],
       equity: 1000,
     };
-    const shortMa = (arr, idx) => {
+    const shortMa = (arr: number[], idx: number) => {
       const start = Math.max(0, idx - short + 1);
       const slice = arr.slice(start, idx + 1);
       return slice.reduce((s, v) => s + v, 0) / slice.length;
     };
-    const longMa = (arr, idx) => {
+    const longMa = (arr: number[], idx: number) => {
       const start = Math.max(0, idx - long + 1);
       const slice = arr.slice(start, idx + 1);
       return slice.reduce((s, v) => s + v, 0) / slice.length;
@@ -29,11 +29,15 @@ export function useStrategySimulator() {
       if (s > l && position === 0) {
         // buy
         position = 1;
-        result.trades.push({ type: "buy", price: prices[i], index: i });
+        if (typeof prices[i] === "number") {
+          result.trades.push({ type: "buy", price: prices[i] as number, index: i });
+        }
       } else if (s < l && position === 1) {
         // sell
         position = 0;
-        result.trades.push({ type: "sell", price: prices[i], index: i });
+        if (typeof prices[i] === "number") {
+          result.trades.push({ type: "sell", price: prices[i] as number, index: i });
+        }
       }
     }
     // calculate equity naive

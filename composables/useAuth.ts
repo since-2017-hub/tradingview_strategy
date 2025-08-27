@@ -1,9 +1,12 @@
 import { ref } from 'vue'
+import { useRuntimeConfig } from '#imports'
 
 const TOKEN_KEY = 'mvp_token'
-const USERS_KEY = 'mvp_users'
 
 export function useAuth(){
+  const config = useRuntimeConfig()
+  const apiBase = String(config.public?.apiBase || '')
+
   const token = ref<string | null>(process.client ? localStorage.getItem(TOKEN_KEY) : null)
 
   function saveToken(t:string|null){
@@ -15,15 +18,44 @@ export function useAuth(){
   }
 
   async function login({email,password}:{email:string,password:string}){
-    // demo-only: accept any credentials and return a fake token
-    await new Promise(r=>setTimeout(r,250))
+    // If an API base URL is configured, call the backend; otherwise use demo fallback
+    if (apiBase) {
+      const res = await fetch(`${apiBase.replace(/\/$/,'')}/auth/login/`, {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ email, password })
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(()=>({detail:res.statusText}))
+        throw new Error(err.detail || 'Login failed')
+      }
+      const body = await res.json()
+      if (!body.token) throw new Error('No token returned')
+      saveToken(body.token)
+      return body.token
+    }
+
+    // demo fallback: accept any credentials and create a local token
+    await new Promise(r=>setTimeout(r,200))
     const fake = btoa(email+":"+Date.now())
     saveToken(fake)
     return fake
   }
 
   async function signup({email,password}:{email:string,password:string}){
-    // demo-only: store user in localStorage
+    if (apiBase) {
+      const res = await fetch(`${apiBase.replace(/\/$/,'')}/auth/signup/`, {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ email, password })
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(()=>({detail:res.statusText}))
+        throw new Error(err.detail || 'Signup failed')
+      }
+      return true
+    }
+
+    // demo fallback: store user in localStorage
+    const USERS_KEY = 'mvp_users'
     const usersRaw = process.client ? localStorage.getItem(USERS_KEY) : null
     const users = usersRaw ? JSON.parse(usersRaw) : []
     if (users.find((u:any)=>u.email===email)) throw new Error('User already exists')

@@ -1,37 +1,17 @@
 <template>
-  <div>
-    <header>
-      <nav class="nav">
-        <NuxtLink to="/">Home</NuxtLink>
-        <NuxtLink to="/auth/login">Login</NuxtLink>
-        <NuxtLink to="/auth/signup">Signup</NuxtLink>
-        <NuxtLink to="/dashboard">Dashboard</NuxtLink>
-        <NuxtLink to="/strategy">Strategy</NuxtLink>
+  <div class="min-h-screen bg-slate-50">
+    <header class="bg-slate-900 text-slate-200">
+      <nav class="flex gap-4 p-4 max-w-6xl mx-auto">
+        <NuxtLink class="hover:text-white" to="/">Home</NuxtLink>
+        <NuxtLink class="hover:text-white" to="/auth/login">Login</NuxtLink>
+        <NuxtLink class="hover:text-white" to="/auth/signup">Signup</NuxtLink>
+        <NuxtLink class="hover:text-white" to="/dashboard">Dashboard</NuxtLink>
+        <NuxtLink class="hover:text-white" to="/strategy">Strategy</NuxtLink>
       </nav>
     </header>
 
-    <main style="padding:20px;min-height:calc(100vh - 64px)">
+    <main class="p-6 min-h-[calc(100vh-64px)] max-w-6xl mx-auto w-full">
       <NuxtPage />
     </main>
   </div>
 </template>
-
-<style scoped>
-.nav {
-  display: flex;
-  gap: 1rem;
-  padding: 1rem;
-  background: #0f172a;
-}
-.nav a {
-  color: #cbd5e1;
-  text-decoration: none;
-}
-.nav a.router-link-active {
-  color: #fff;
-  font-weight: 600;
-}
-main {
-  padding: 1.5rem;
-}
-</style>

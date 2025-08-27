@@ -1,29 +1,37 @@
 <template>
-  <div class="signup-container">
-    <form @submit.prevent="handleSignup" class="signup-form">
-      <h2>Sign Up</h2>
+  <div>
+    <form @submit.prevent="handleSignup" class="space-y-4">
+      <h2 class="text-xl font-semibold">Create an account</h2>
+
       <div>
-        <label>Email</label>
-        <input v-model="email" type="email" required />
+        <label class="block text-sm text-slate-700">Email</label>
+        <input v-model="email" type="email" required class="mt-1 block w-full rounded border-slate-200 shadow-sm focus:ring-sky-500 focus:border-sky-500" />
       </div>
+
       <div>
-        <label>Password</label>
-        <input v-model="password" type="password" required />
+        <label class="block text-sm text-slate-700">Password</label>
+        <input v-model="password" type="password" required class="mt-1 block w-full rounded border-slate-200 shadow-sm focus:ring-sky-500 focus:border-sky-500" />
       </div>
+
       <div>
-        <label>Confirm</label>
-        <input v-model="confirmPassword" type="password" required />
+        <label class="block text-sm text-slate-700">Confirm Password</label>
+        <input v-model="confirmPassword" type="password" required class="mt-1 block w-full rounded border-slate-200 shadow-sm focus:ring-sky-500 focus:border-sky-500" />
       </div>
-      <button type="submit">Create Account</button>
-      <p v-if="error" class="error">{{ error }}</p>
+
+      <div>
+        <button type="submit" class="w-full bg-sky-600 text-white py-2 rounded">Create Account</button>
+      </div>
+
+      <p v-if="error" class="text-sm text-red-600">{{ error }}</p>
     </form>
   </div>
 </template>
 
 <script setup>
+definePageMeta({ layout: 'auth' })
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useAuth } from '../../../composables/useAuth'
+import { useAuth } from '~/composables/useAuth'
 
 
 const { signup } = useAuth()
@@ -40,7 +48,6 @@ async function handleSignup(){
     return
   }
   try {
-    // demo-only signup: persist locally via composable
     await signup({ email: email.value, password: password.value })
     router.push('/auth/login')
   } catch (err) {
@@ -48,10 +55,3 @@ async function handleSignup(){
   }
 }
 </script>
-
-<style scoped>
-.signup-container { max-width:420px; margin:40px auto }
-.signup-form { background:#fff; padding:20px; border-radius:8px; box-shadow:0 4px 20px rgba(0,0,0,0.06) }
-.signup-form input { display:block; width:100%; margin:8px 0 12px; padding:8px }
-.error { color:#c00 }
-</style>
