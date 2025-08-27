@@ -1,8 +1,29 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import { resolve } from "path";
+import tsconfigPaths from "vite-tsconfig-paths";
+
+const ROOT = resolve(process.cwd()).replace(/\\/g, "/");
+
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
-  css: ["~/assets/css/main.css"],
+
+  // use root-based path so virtual modules can import it reliably
+  // use absolute filesystem path so Vite/nuxt can load it on Windows
+
+  vite: {
+    // normalize aliases for Windows and use regex-based replacements
+    resolve: {
+      alias: [
+        { find: /^~\//, replacement: ROOT + "/" },
+        { find: /^@\//, replacement: ROOT + "/" },
+      ],
+    },
+    plugins: [tsconfigPaths()],
+  },
+
+  css: [resolve(process.cwd(), "~assets/css/main.css")],
+
   runtimeConfig: {
     public: {
       apiBase: process.env.API_BASE || "",
@@ -14,4 +35,6 @@ export default defineNuxtConfig({
       },
     },
   },
+
+  modules: ["@nuxtjs/tailwindcss"],
 });

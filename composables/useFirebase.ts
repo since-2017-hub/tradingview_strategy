@@ -1,6 +1,6 @@
 import { initializeApp, getApps } from 'firebase/app'
 import { getFirestore } from 'firebase/firestore'
-import { useRuntimeConfig } from '#imports'
+import { useRuntimeConfig } from 'nuxt/app'
 
 export function useFirebase(){
   const config = useRuntimeConfig()
