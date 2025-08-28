@@ -1,6 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import { resolve } from "path";
 import tsconfigPaths from "vite-tsconfig-paths";
+import tailwindcss from "@tailwindcss/vite";
 
 const ROOT = resolve(process.cwd()).replace(/\\/g, "/");
 
@@ -17,12 +18,15 @@ export default defineNuxtConfig({
       alias: [
         { find: /^~\//, replacement: ROOT + "/" },
         { find: /^@\//, replacement: ROOT + "/" },
+        // resolve bare imports like 'assets/css/...' emitted by Nuxt's virtual modules
+        { find: /^assets\//, replacement: ROOT + "/assets/" },
       ],
     },
-    plugins: [tsconfigPaths()],
+    plugins: [tsconfigPaths(), tailwindcss()],
   },
 
-  css: [resolve(process.cwd(), "~assets/css/main.css")],
+  // use a relative file path so Vite treats this as a file import (not a bare specifier)
+  css: ["./assets/css/main.css"],
 
   runtimeConfig: {
     public: {
@@ -35,6 +39,4 @@ export default defineNuxtConfig({
       },
     },
   },
-
-  modules: ["@nuxtjs/tailwindcss"],
 });

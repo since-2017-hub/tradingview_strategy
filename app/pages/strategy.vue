@@ -26,6 +26,10 @@
       <ul class="mt-2 space-y-1 text-slate-600">
         <li v-for="(t, i) in result.trades" :key="i">{{ t.type }} @ {{ t.price }} (i:{{ t.index }})</li>
       </ul>
+        <div class="mt-4 flex gap-2">
+          <button class="bg-green-600 text-white px-3 py-1 rounded" @click="save">Save</button>
+          <button class="bg-slate-200 px-3 py-1 rounded" @click="exportCsv">Export CSV</button>
+        </div>
     </div>
   </div>
 </template>
@@ -42,5 +46,24 @@ const { simulate } = useStrategySimulator()
 
 function run() {
   result.value = simulate({ short: short.value, long: long.value })
+}
+
+function save() {
+  const key = 'mvp_sims'
+  const raw = localStorage.getItem(key)
+  const arr = raw ? JSON.parse(raw) : []
+  arr.unshift({ date: Date.now(), params: { short: short.value, long: long.value }, result: result.value })
+  localStorage.setItem(key, JSON.stringify(arr))
+  alert('Saved')
+}
+
+function exportCsv() {
+  if (!result.value) return
+  const rows = [['type', 'price', 'index']].concat(result.value.trades.map((t: any) => [t.type, t.price, t.index]))
+  const csv = rows.map(r => r.join(',')).join('\n')
+  const blob = new Blob([csv], { type: 'text/csv' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url; a.download = 'strategy-trades.csv'; a.click(); URL.revokeObjectURL(url)
 }
 </script>

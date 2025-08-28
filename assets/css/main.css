@@ -1,5 +1,22 @@
-html,
-body,
-#app {
-  height: 100%;
-}
+@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Base layout tweaks */
+html, body, #app { height: 100%; }
+
+/* Small utility: subtle card shadow and transition */
+.card-shadow { @apply bg-white rounded-lg shadow-sm transition-transform duration-150 ease-in-out; }
+.card-shadow:hover { @apply -translate-y-1 shadow-md }
+
+/* Nice focus rings for inputs/buttons */
+.focus-ring { @apply focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-1 }
+
+/* Small helper for monospace numbers */
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', 'Helvetica Neue', monospace }
+
+/* button subtle hover */
+.btn { @apply inline-flex items-center gap-2 px-3 py-1 rounded  }
+.btn-primary { @apply bg-sky-600 text-white }
+.btn-ghost { @apply bg-transparent border border-slate-200 }

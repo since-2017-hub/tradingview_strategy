@@ -1,5 +1,8 @@
 import { ref } from 'vue'
-import { useRuntimeConfig } from '#imports'
+import { useRuntimeConfig } from 'nuxt/app'
+import { useFirebase } from './useFirebase'
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, User } from 'firebase/auth'
+import { ref as vueRef, onMounted, onBeforeUnmount } from 'vue'
 
 const TOKEN_KEY = 'mvp_token'
 
@@ -7,7 +10,24 @@ export function useAuth(){
   const config = useRuntimeConfig()
   const apiBase = String(config.public?.apiBase || '')
 
+  const { auth } = useFirebase()
+
   const token = ref<string | null>(process.client ? localStorage.getItem(TOKEN_KEY) : null)
+  const currentUser = vueRef<User | null>(null)
+
+  let unsub: (() => void) | null = null
+  if (auth) {
+    // set up listener to keep token in sync
+    unsub = onAuthStateChanged(auth, async (u) => {
+      currentUser.value = u as User | null
+      if (u) {
+        const id = await u.getIdToken()
+        saveToken(id)
+      } else {
+        saveToken(null)
+      }
+    })
+  }
 
   function saveToken(t:string|null){
     token.value = t
@@ -18,9 +38,17 @@ export function useAuth(){
   }
 
   async function login({email,password}:{email:string,password:string}){
-    // If an API base URL is configured, call the backend; otherwise use demo fallback
+    // If Firebase is configured, use Firebase Auth
+    if (auth) {
+      const userCred = await signInWithEmailAndPassword(auth, email, password)
+      const idToken = await userCred.user.getIdToken()
+      saveToken(idToken)
+      return idToken
+    }
+
+    // If an API base URL is configured, call the backend
     if (apiBase) {
-      const res = await fetch(`${apiBase.replace(/\/$/,'')}/auth/login/`, {
+      const res = await fetch(`${apiBase.replace(/\/$/, '')}/auth/login/`, {
         method: 'POST', headers: {'Content-Type':'application/json'},
         body: JSON.stringify({ email, password })
       })
@@ -42,8 +70,16 @@ export function useAuth(){
   }
 
   async function signup({email,password}:{email:string,password:string}){
+    // Firebase signup
+    if (auth) {
+      const userCred = await createUserWithEmailAndPassword(auth, email, password)
+      const idToken = await userCred.user.getIdToken()
+      saveToken(idToken)
+      return true
+    }
+
     if (apiBase) {
-      const res = await fetch(`${apiBase.replace(/\/$/,'')}/auth/signup/`, {
+      const res = await fetch(`${apiBase.replace(/\/$/, '')}/auth/signup/`, {
         method: 'POST', headers: {'Content-Type':'application/json'},
         body: JSON.stringify({ email, password })
       })
@@ -65,6 +101,9 @@ export function useAuth(){
   }
 
   function logout(){
+    if (auth) {
+      signOut(auth)
+    }
     saveToken(null)
   }
 
@@ -72,5 +111,5 @@ export function useAuth(){
     return !!token.value
   }
 
-  return { login, signup, logout, isAuthenticated, token }
+  return { login, signup, logout, isAuthenticated, token, currentUser }
 }
